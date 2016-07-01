@@ -164,7 +164,11 @@ exports.transform = exports.filter = function transform(config) {
     var origThen = changes.then;
     changes.then = function (resolve, reject) {
       return origThen.apply(changes, [function (res) {
-        modifyChanges(res).then(resolve, reject);
+        if (res.status === 'cancelled') {
+          reject();
+        } else {
+          modifyChanges(res).then(resolve, reject);
+        }
       }, reject]);
     };
     return changes;
